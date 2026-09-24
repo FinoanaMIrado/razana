@@ -1,337 +1,720 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="mg">
 <head>
 <meta charset="UTF-8">
-<title>RAZANA </title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAZANA — Faire-part de Décès</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  body { margin: 0; background: #0a0a1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-  canvas { display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Georgia', serif;
+  background: #0a0a1a;
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(0,200,255,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  padding: 14px 32px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+nav button.active {
+  color: #00c8ff;
+  border-bottom: 2px solid #00c8ff;
+}
+
+nav button:hover { color: #e0c88a; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== PAGE 1 : SQUELETTE ===== */
+#page-skel {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  min-height: calc(100vh - 49px);
+}
+#page-skel.active { display: flex; }
+
+canvas { display: block; border-radius: 12px; }
+
+/* ===== PAGE 2 : FAIRE-PART ===== */
+#page-fp {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 3rem;
+  min-height: calc(100vh - 49px);
+}
+#page-fp.active { display: flex; }
+
+.fp-title {
+  color: #e0c88a;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  letter-spacing: 2px;
+}
+
+.fp-sub {
+  color: #888;
+  font-size: 0.82rem;
+  text-align: center;
+  margin-bottom: 1.8rem;
+  font-style: italic;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 560px;
+  color: #222;
+}
+
+.section-title {
+  font-size: 0.72rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #888;
+  margin: 1.4rem 0 0.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+.section-title:first-child { margin-top: 0; }
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 3px;
+  margin-top: 10px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-family: Georgia, serif;
+  color: #222;
+  background: #fafafa;
+  transition: border 0.2s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #8b6914;
+  background: #fff;
+}
+
+textarea { resize: vertical; min-height: 65px; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-preview {
+  display: block;
+  width: 100%;
+  margin-top: 1.6rem;
+  padding: 13px;
+  background: #1a1a2e;
+  color: #e0c88a;
+  border: 1px solid rgba(224,200,138,0.3);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: Georgia, serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-preview:hover { background: #0a0a1a; }
+
+/* APERÇU */
+.preview-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  margin-top: 1.5rem;
+  padding: 2.2rem 2rem;
+  color: #222;
+  display: none;
+  border: 2px solid #2c2c2c;
+  font-family: 'Times New Roman', serif;
+}
+.preview-box.visible { display: block; }
+
+.prev-cross { text-align: center; font-size: 2.2rem; margin-bottom: 0.4rem; }
+.prev-intro { text-align: center; font-size: 0.77rem; color: #333; font-style: italic; line-height: 1.6; margin-bottom: 0.8rem; }
+.prev-name  { text-align: center; font-size: 1.5rem; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 0.2rem; }
+.prev-titre { text-align: center; font-size: 0.95rem; font-style: italic; color: #333; margin-bottom: 0.7rem; }
+.prev-sep   { border: none; border-top: 1px solid #bbb; margin: 0.7rem 0; }
+.prev-dates { text-align: center; font-size: 0.85rem; margin-bottom: 0.8rem; }
+.prev-fam-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 0.3rem; }
+.prev-fam   { font-size: 0.82rem; line-height: 1.8; margin-bottom: 0.8rem; }
+.prev-metiers { font-size: 0.78rem; color: #333; line-height: 1.9; text-align: center; margin-bottom: 0.8rem; }
+.prev-footer  { text-align: center; font-size: 0.78rem; font-style: italic; color: #333; line-height: 1.7; margin-bottom: 0.5rem; }
+.prev-msgfin  { text-align: center; font-size: 0.82rem; font-style: italic; color: #222; line-height: 1.7; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; padding: 0.5rem 0; margin-bottom: 0.6rem; }
+.prev-misaotra { text-align: center; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; margin-top: 0.4rem; }
+
+.btn-dl {
+  display: none;
+  width: 100%;
+  max-width: 560px;
+  margin-top: 1rem;
+  padding: 13px;
+  background: #8b6914;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: Georgia, serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-dl.visible { display: block; }
+.btn-dl:hover { background: #6b500e; }
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+
+<nav>
+  <button class="active" onclick="showPage('skel', this)"> RAZANA</button>
+  <button onclick="showPage('fp', this)"> Fera-para</button>
+</nav>
+
+<!-- PAGE SQUELETTE -->
+<div id="page-skel" class="page active">
+  <canvas id="c"></canvas>
+</div>
+
+<!-- PAGE FAIRE-PART -->
+<div id="page-fp" class="page">
+  <p class="fp-title">fera-para adaladala</p>
+  <p class="fp-sub">Fanambarana ny fiafaranandro</p>
+
+  <div class="card">
+    <div class="section-title">Ny maty</div>
+
+    <label>Anarana feno </label>
+    <input id="nom" type="text" placeholder="oh : RAKOTOBE Jean" required>
+
+    <label>Asa </label>
+    <input id="titre" type="text" placeholder="oh : Mpisoloky..." required>
+
+    <div class="row2">
+      <div>
+        <label>Daty nahafatesana</label>
+        <input id="date_deces" type="date" required>
+      </div>
+      <div>
+        <label>Taona</label>
+        <input id="age" type="number" placeholder="oh : 72" required >
+      </div>
+    </div>
+
+    <label>Daty fandevenana </label>
+    <input id="date_enterrement" type="date" required>
+
+    <label>Ora sy toerana </label>
+    <input id="lieu" type="text" placeholder="oh : 9h00 ao @ FJKM Analakely, Antananarivo">
+
+    <div class="section-title">Fianakaviana </div>
+
+    <label>Vadiny </label>
+    <input id="vadiny" type="text" placeholder="oh : KialaNgita">
+
+    <label>Zanany </label>
+    <input id="zanany" type="text" placeholder="ex : Babouzina, Chun  Lee, Sitraka">
+
+    <label>Iray tampo aminy</label>
+    <input id="tampo" type="text" placeholder="oh : Adakely">
+
+    <label>Fianakaviana hafa </label>
+    <textarea id="famille_autre" placeholder="oh : Ny zafy, ny zama, ny dadatoa..."></textarea>
+
+    <div class="section-title">Mombamomba </div>
+
+    <label>Asany)</label>
+    <textarea id="metiers" placeholder="Ny mpanao gâteaux..."></textarea>
+
+    <label>Teny masina kely XD</label>
+    <textarea id="citation" placeholder="ex : dia nantsoin'ny Ray hody any Aminy..."></textarea>
+
+    <label>Hafatra farany </label>
+    <textarea id="message_fin" placeholder="ex : Ny fiaretantory dia isan-kalina&#10;Misy iany koa ny fiaretana atoandro"></textarea>
+
+    <button class="btn-preview" onclick="generer()">Lay fera-para</button>
+  </div>
+
+  <div class="preview-box" id="preview"></div>
+  <button class="btn-dl" id="dlBtn" onclick="telecharger()">Telecharzeoooo ary </button>
+</div>
+
 <script>
+/* ======= NAVIGATION ======= */
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'skel' && !animRunning) startAnim();
+}
+
+/* ======= SQUELETTE 3D ======= */
+let animRunning = false;
+let t = 0;
 const canvas = document.getElementById('c');
-const W = 480, H = 560;
-canvas.width = W; canvas.height = H;
 const ctx = canvas.getContext('2d');
 
-let t = 0;
+function resizeCanvas() {
+  const vw = Math.min(window.innerWidth - 24, 480);
+  const vh = Math.min(window.innerHeight - 80, 560);
+  const s = Math.min(vw / 480, vh / 560);
+  canvas.width  = Math.round(480 * s);
+  canvas.height = Math.round(560 * s);
+  canvas.dataset.scale = s;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-function bone(x1, y1, x2, y2, r1, r2, color) {
-  const dx = x2 - x1, dy = y2 - y1;
-  const len = Math.sqrt(dx*dx + dy*dy);
+function bone(cx, x1, y1, x2, y2, r1, r2, color) {
+  const s = parseFloat(canvas.dataset.scale) || 1;
+  x1*=s; y1*=s; x2*=s; y2*=s; r1*=s; r2*=s;
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.sqrt(dx*dx+dy*dy);
   const nx = -dy/len, ny = dx/len;
-
-  ctx.beginPath();
-  ctx.moveTo(x1 + nx*r1, y1 + ny*r1);
-  ctx.bezierCurveTo(
-    x1 + nx*r1 + dx*0.3, y1 + ny*r1 + dy*0.3,
-    x2 + nx*r2 + dx*(-0.3), y2 + ny*r2 + dy*(-0.3),
-    x2 + nx*r2, y2 + ny*r2
-  );
-  ctx.lineTo(x2 - nx*r2, y2 - ny*r2);
-  ctx.bezierCurveTo(
-    x2 - nx*r2 + dx*(-0.3), y2 - ny*r2 + dy*(-0.3),
-    x1 - nx*r1 + dx*0.3, y1 - ny*r1 + dy*0.3,
-    x1 - nx*r1, y1 - ny*r1
-  );
-  ctx.closePath();
-
-  const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-  grad.addColorStop(0, color);
-  grad.addColorStop(0.5, '#ffffff');
-  grad.addColorStop(1, color);
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  ctx.strokeStyle = 'rgba(0,200,255,0.4)';
-  ctx.lineWidth = 0.5;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(x1, y1, r1, 0, Math.PI*2);
-  const g1 = ctx.createRadialGradient(x1-r1*0.3, y1-r1*0.3, 0, x1, y1, r1);
-  g1.addColorStop(0, '#ffffff');
-  g1.addColorStop(1, color);
-  ctx.fillStyle = g1;
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(x2, y2, r2, 0, Math.PI*2);
-  const g2 = ctx.createRadialGradient(x2-r2*0.3, y2-r2*0.3, 0, x2, y2, r2);
-  g2.addColorStop(0, '#ffffff');
-  g2.addColorStop(1, color);
-  ctx.fillStyle = g2;
-  ctx.fill();
+  cx.beginPath();
+  cx.moveTo(x1+nx*r1, y1+ny*r1);
+  cx.bezierCurveTo(x1+nx*r1+dx*0.3,y1+ny*r1+dy*0.3, x2+nx*r2+dx*(-0.3),y2+ny*r2+dy*(-0.3), x2+nx*r2,y2+ny*r2);
+  cx.lineTo(x2-nx*r2, y2-ny*r2);
+  cx.bezierCurveTo(x2-nx*r2+dx*(-0.3),y2-ny*r2+dy*(-0.3), x1-nx*r1+dx*0.3,y1-ny*r1+dy*0.3, x1-nx*r1,y1-ny*r1);
+  cx.closePath();
+  const g = cx.createLinearGradient(x1,y1,x2,y2);
+  g.addColorStop(0,color); g.addColorStop(0.5,'#fff'); g.addColorStop(1,color);
+  cx.fillStyle=g; cx.fill();
+  cx.strokeStyle='rgba(0,200,255,0.4)'; cx.lineWidth=0.5*s; cx.stroke();
+  [[[x1,y1,r1],[x2,y2,r2]]].flat().forEach(([px,py,pr])=>{
+    cx.beginPath(); cx.arc(px,py,pr,0,Math.PI*2);
+    const rg=cx.createRadialGradient(px-pr*0.3,py-pr*0.3,0,px,py,pr);
+    rg.addColorStop(0,'#fff'); rg.addColorStop(1,color);
+    cx.fillStyle=rg; cx.fill();
+  });
 }
 
-function skull(cx, cy, scale) {
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  const glow = ctx.createRadialGradient(0, -5*scale, 2, 0, -5*scale, 28*scale);
-  glow.addColorStop(0, 'rgba(0,255,255,0.15)');
-  glow.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.beginPath();
-  ctx.arc(0, -5*scale, 28*scale, 0, Math.PI*2);
-  ctx.fillStyle = glow;
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.ellipse(0, -8*scale, 18*scale, 20*scale, 0, 0, Math.PI*2);
-  const cg = ctx.createRadialGradient(-5*scale, -15*scale, 1, 0, -8*scale, 20*scale);
-  cg.addColorStop(0, '#ffffff');
-  cg.addColorStop(0.6, '#c8e8f0');
-  cg.addColorStop(1, '#7ab8cc');
-  ctx.fillStyle = cg;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(0,200,255,0.5)';
-  ctx.lineWidth = 0.8;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.ellipse(0, 12*scale, 12*scale, 8*scale, 0, 0, Math.PI*2);
-  ctx.fillStyle = '#c8e8f0';
-  ctx.fill();
-  ctx.stroke();
-
-  [-7, 7].forEach(ox => {
-    ctx.beginPath();
-    ctx.ellipse(ox*scale, -8*scale, 5*scale, 4*scale, 0, 0, Math.PI*2);
-    ctx.fillStyle = '#0a0a1a';
-    ctx.fill();
-
-    const eg = ctx.createRadialGradient(ox*scale, -8*scale, 0, ox*scale, -8*scale, 5*scale);
-    eg.addColorStop(0, 'rgba(0,255,200,0.9)');
-    eg.addColorStop(0.5, 'rgba(0,150,255,0.4)');
-    eg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.beginPath();
-    ctx.ellipse(ox*scale, -8*scale, 5*scale, 4*scale, 0, 0, Math.PI*2);
-    ctx.fillStyle = eg;
-    ctx.fill();
+function skull(cx, ox, oy, sc) {
+  const s = (parseFloat(canvas.dataset.scale)||1)*sc;
+  cx.save(); cx.translate(ox, oy);
+  const glow=cx.createRadialGradient(0,-5*s,2,0,-5*s,28*s);
+  glow.addColorStop(0,'rgba(0,255,255,0.15)'); glow.addColorStop(1,'rgba(0,0,0,0)');
+  cx.beginPath(); cx.arc(0,-5*s,28*s,0,Math.PI*2); cx.fillStyle=glow; cx.fill();
+  cx.beginPath(); cx.ellipse(0,-8*s,18*s,20*s,0,0,Math.PI*2);
+  const cg=cx.createRadialGradient(-5*s,-15*s,1,0,-8*s,20*s);
+  cg.addColorStop(0,'#fff'); cg.addColorStop(0.6,'#c8e8f0'); cg.addColorStop(1,'#7ab8cc');
+  cx.fillStyle=cg; cx.fill(); cx.strokeStyle='rgba(0,200,255,0.5)'; cx.lineWidth=0.8*s; cx.stroke();
+  cx.beginPath(); cx.ellipse(0,12*s,12*s,8*s,0,0,Math.PI*2);
+  cx.fillStyle='#c8e8f0'; cx.fill(); cx.stroke();
+  [-7,7].forEach(ox2=>{
+    cx.beginPath(); cx.ellipse(ox2*s,-8*s,5*s,4*s,0,0,Math.PI*2); cx.fillStyle='#0a0a1a'; cx.fill();
+    const eg=cx.createRadialGradient(ox2*s,-8*s,0,ox2*s,-8*s,5*s);
+    eg.addColorStop(0,'rgba(0,255,200,0.9)'); eg.addColorStop(0.5,'rgba(0,150,255,0.4)'); eg.addColorStop(1,'rgba(0,0,0,0)');
+    cx.beginPath(); cx.ellipse(ox2*s,-8*s,5*s,4*s,0,0,Math.PI*2); cx.fillStyle=eg; cx.fill();
   });
-
-  ctx.beginPath();
-  ctx.moveTo(0, -2*scale);
-  ctx.lineTo(-2*scale, 3*scale);
-  ctx.lineTo(2*scale, 3*scale);
-  ctx.fillStyle = '#0a0a1a';
-  ctx.fill();
-
-  for(let i=-3; i<=3; i++) {
-    ctx.beginPath();
-    ctx.rect(i*3*scale - 1*scale, 8*scale, 2*scale, 3*scale);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-  }
-
-  ctx.restore();
+  cx.beginPath(); cx.moveTo(0,-2*s); cx.lineTo(-2*s,3*s); cx.lineTo(2*s,3*s); cx.fillStyle='#0a0a1a'; cx.fill();
+  for(let i=-3;i<=3;i++){ cx.beginPath(); cx.rect(i*3*s-s,8*s,2*s,3*s); cx.fillStyle='#fff'; cx.fill(); }
+  cx.restore();
 }
 
-function drawRazana(cx, cy) {
-  const pulse = 0.7 + 0.3 * Math.sin(t * 0.08);
-  const glowSize = 18 + 4 * Math.sin(t * 0.08);
-
-  const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowSize * 4);
-  halo.addColorStop(0, `rgba(0,255,200,${0.25 * pulse})`);
-  halo.addColorStop(0.5, `rgba(0,150,255,${0.12 * pulse})`);
-  halo.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.beginPath();
-  ctx.ellipse(cx, cy, glowSize * 4, glowSize * 1.5, 0, 0, Math.PI * 2);
-  ctx.fillStyle = halo;
-  ctx.fill();
-
-  ctx.save();
-  ctx.shadowColor = `rgba(0,255,200,${0.9 * pulse})`;
-  ctx.shadowBlur = 18;
-  ctx.font = 'bold 26px monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  const letters = 'RAZANA';
-  const totalW = letters.length * 17;
-  const startX = cx - totalW / 2 + 8;
-
-  letters.split('').forEach((ch, i) => {
-    const hue = (200 + i * 15 + t * 0.5) % 360;
-    ctx.fillStyle = `hsl(${hue}, 100%, ${70 + 15 * Math.sin(t*0.1 + i)}%)`;
-    ctx.fillText(ch, startX + i * 17, cy);
+function drawRazana(cx, ox, oy) {
+  const s = parseFloat(canvas.dataset.scale)||1;
+  const pulse = 0.7+0.3*Math.sin(t*0.08);
+  const gs = (18+4*Math.sin(t*0.08))*s;
+  const halo=cx.createRadialGradient(ox,oy,0,ox,oy,gs*4);
+  halo.addColorStop(0,`rgba(0,255,200,${0.25*pulse})`);
+  halo.addColorStop(0.5,`rgba(0,150,255,${0.12*pulse})`);
+  halo.addColorStop(1,'rgba(0,0,0,0)');
+  cx.beginPath(); cx.ellipse(ox,oy,gs*4,gs*1.5,0,0,Math.PI*2); cx.fillStyle=halo; cx.fill();
+  cx.save();
+  cx.shadowColor=`rgba(0,255,200,${0.9*pulse})`; cx.shadowBlur=18*s;
+  cx.font=`bold ${Math.round(26*s)}px monospace`;
+  cx.textAlign='center'; cx.textBaseline='middle';
+  const lw = 17*s;
+  'RAZANA'.split('').forEach((ch,i)=>{
+    const hue=(200+i*15+t*0.5)%360;
+    cx.fillStyle=`hsl(${hue},100%,${70+15*Math.sin(t*0.1+i)}%)`;
+    cx.fillText(ch, ox - 'RAZANA'.length*lw/2 + i*lw + lw/2, oy);
   });
-
-  ctx.restore();
-
-  const lineAlpha = 0.4 + 0.2 * Math.sin(t * 0.08);
-  ctx.beginPath();
-  ctx.moveTo(cx - 55, cy + 14);
-  ctx.lineTo(cx + 55, cy + 14);
-  ctx.strokeStyle = `rgba(0,220,255,${lineAlpha})`;
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  [cx - 55, cx + 55].forEach(dx => {
-    ctx.beginPath();
-    ctx.moveTo(dx, cy + 14 - 4);
-    ctx.lineTo(dx + 4, cy + 14);
-    ctx.lineTo(dx, cy + 14 + 4);
-    ctx.lineTo(dx - 4, cy + 14);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(0,220,255,${lineAlpha})`;
-    ctx.fill();
+  cx.restore();
+  const la=0.4+0.2*Math.sin(t*0.08);
+  cx.beginPath(); cx.moveTo(ox-55*s,oy+14*s); cx.lineTo(ox+55*s,oy+14*s);
+  cx.strokeStyle=`rgba(0,220,255,${la})`; cx.lineWidth=s; cx.stroke();
+  [ox-55*s, ox+55*s].forEach(dx=>{
+    const d4=4*s;
+    cx.beginPath(); cx.moveTo(dx,oy+14*s-d4); cx.lineTo(dx+d4,oy+14*s);
+    cx.lineTo(dx,oy+14*s+d4); cx.lineTo(dx-d4,oy+14*s); cx.closePath();
+    cx.fillStyle=`rgba(0,220,255,${la})`; cx.fill();
   });
 }
 
 function draw() {
-  ctx.clearRect(0, 0, W, H);
+  const W=canvas.width, H=canvas.height;
+  const s=parseFloat(canvas.dataset.scale)||1;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0a0a1a'; ctx.fillRect(0,0,W,H);
 
-  ctx.fillStyle = '#0a0a1a';
-  ctx.fillRect(0, 0, W, H);
-
-  for(let i=0; i<40; i++) {
-    const px = (i*67+t*0.2) % W;
-    const py = (i*43+t*0.15) % H;
-    const a = 0.3 + 0.3*Math.sin(t*0.05+i);
-    ctx.beginPath();
-    ctx.arc(px, py, 1, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(0,200,255,${a})`;
-    ctx.fill();
+  for(let i=0;i<40;i++){
+    const px=(i*67+t*0.2)%W, py=(i*43+t*0.15)%H;
+    const a=0.3+0.3*Math.sin(t*0.05+i);
+    ctx.beginPath(); ctx.arc(px,py,s,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,200,255,${a})`; ctx.fill();
   }
 
-  const cx = W/2;
-  const cy = H/2;
+  const cx2=W/2, cy2=H/2;
+  const sway=Math.sin(t*0.04)*8, bob=Math.sin(t*0.07)*5, breathe=Math.sin(t*0.05)*2;
+  const armA=Math.sin(t*0.06)*0.4, legA=Math.sin(t*0.06)*0.3;
+  const bc='#a8d8e8';
 
-  const sway      = Math.sin(t * 0.04) * 8;
-  const bob       = Math.sin(t * 0.07) * 5;
-  const breathe   = Math.sin(t * 0.05) * 2;
-  const armAngle  = Math.sin(t * 0.06) * 0.4;
-  const legAngle  = Math.sin(t * 0.06) * 0.3;
+  const spX=240+sway*0.5, spT=270+bob, spB=400+bob;
 
-  const boneColor = '#a8d8e8';
-
-  const spineX   = cx + sway*0.5;
-  const spineTop = cy - 60 + bob;
-  const spineBot = cy + 70 + bob;
-
-  // Colonne vertébrale
-  for(let i=0; i<7; i++) {
-    const y  = spineTop + i*(spineBot-spineTop)/6;
-    const yn = spineTop + (i+1)*(spineBot-spineTop)/6;
-    bone(spineX, y, spineX, yn, 5+breathe, 5+breathe, boneColor);
+  for(let i=0;i<7;i++){
+    const y=spT+i*(spB-spT)/6, yn=spT+(i+1)*(spB-spT)/6;
+    bone(ctx,spX,y,spX,yn,5+breathe,5+breathe,bc);
   }
 
   // Bassin
-  ctx.beginPath();
-  ctx.ellipse(spineX, spineBot, 32, 14, 0, 0, Math.PI*2);
-  const pg = ctx.createRadialGradient(spineX-8, spineBot-5, 1, spineX, spineBot, 32);
-  pg.addColorStop(0, '#ffffff');
-  pg.addColorStop(0.6, '#a8d8e8');
-  pg.addColorStop(1, '#5a9ab0');
-  ctx.fillStyle = pg;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(0,200,255,0.4)';
-  ctx.lineWidth = 0.8;
-  ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(spX*s,spB*s,32*s,14*s,0,0,Math.PI*2);
+  const pg=ctx.createRadialGradient(spX*s-8*s,spB*s-5*s,s,spX*s,spB*s,32*s);
+  pg.addColorStop(0,'#fff'); pg.addColorStop(0.6,'#a8d8e8'); pg.addColorStop(1,'#5a9ab0');
+  ctx.fillStyle=pg; ctx.fill(); ctx.strokeStyle='rgba(0,200,255,0.4)'; ctx.lineWidth=0.8*s; ctx.stroke();
 
   // Côtes
-  const chestX = spineX;
-  const chestY = cy - 20 + bob;
-
-  for(let i=0; i<5; i++) {
-    const ry     = chestY + i*14;
-    const spread = 22 + i*2 + breathe;
-
-    ctx.beginPath();
-    ctx.moveTo(chestX, ry);
-    ctx.bezierCurveTo(chestX - spread*0.5, ry - 5, chestX - spread, ry + 5, chestX - spread, ry + 10);
-    ctx.strokeStyle = '#a8d8e8';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(chestX, ry);
-    ctx.bezierCurveTo(chestX + spread*0.5, ry - 5, chestX + spread, ry + 5, chestX + spread, ry + 10);
+  const chX=spX, chY=240+bob;
+  for(let i=0;i<5;i++){
+    const ry=chY+i*14, sp2=22+i*2+breathe;
+    ctx.beginPath(); ctx.moveTo(chX*s,ry*s);
+    ctx.bezierCurveTo((chX-sp2*0.5)*s,(ry-5)*s,(chX-sp2)*s,(ry+5)*s,(chX-sp2)*s,(ry+10)*s);
+    ctx.strokeStyle='#a8d8e8'; ctx.lineWidth=3*s; ctx.lineCap='round'; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(chX*s,ry*s);
+    ctx.bezierCurveTo((chX+sp2*0.5)*s,(ry-5)*s,(chX+sp2)*s,(ry+5)*s,(chX+sp2)*s,(ry+10)*s);
     ctx.stroke();
   }
+  bone(ctx,chX,chY,chX,chY+60+breathe,5,4,bc);
 
-  // Sternum
-  bone(chestX, chestY, chestX, chestY + 60 + breathe, 5, 4, boneColor);
+  const shY=205+bob, shS=55;
+  bone(ctx,spX,shY,spX-shS,shY+5,5,6,bc);
+  bone(ctx,spX,shY,spX+shS,shY+5,5,6,bc);
 
-  // Clavicules
-  const shoulderY    = cy - 55 + bob;
-  const shoulderSpan = 55;
-  bone(spineX, shoulderY, spineX - shoulderSpan, shoulderY + 5, 5, 6, boneColor);
-  bone(spineX, shoulderY, spineX + shoulderSpan, shoulderY + 5, 5, 6, boneColor);
+  const lShX=spX-shS, lShY=shY+5;
+  const lElX=lShX-20-Math.sin(armA)*30, lElY=lShY+70;
+  const lHaX=lElX-5-Math.sin(armA*1.5)*20, lHaY=lElY+55;
+  bone(ctx,lShX,lShY,lElX,lElY,7,6,bc);
+  bone(ctx,lElX,lElY,lHaX,lHaY,5,4,bc);
+  bone(ctx,lHaX,lHaY,lHaX-5,lHaY+15,4,2,bc);
+  bone(ctx,lHaX,lHaY,lHaX+3,lHaY+16,3,2,bc);
+  bone(ctx,lHaX,lHaY,lHaX+8,lHaY+14,3,2,bc);
 
-  // Bras gauche
-  const lShX = spineX - shoulderSpan;
-  const lShY = shoulderY + 5;
-  const lElX = lShX - 20 - Math.sin(armAngle)*30;
-  const lElY = lShY + 70;
-  const lHaX = lElX - 5 - Math.sin(armAngle*1.5)*20;
-  const lHaY = lElY + 55;
+  const rShX=spX+shS, rShY=shY+5;
+  const rElX=rShX+20+Math.sin(armA)*30, rElY=rShY+70;
+  const rHaX=rElX+5+Math.sin(armA*1.5)*20, rHaY=rElY+55;
+  bone(ctx,rShX,rShY,rElX,rElY,7,6,bc);
+  bone(ctx,rElX,rElY,rHaX,rHaY,5,4,bc);
+  bone(ctx,rHaX,rHaY,rHaX+5,rHaY+15,4,2,bc);
+  bone(ctx,rHaX,rHaY,rHaX-3,rHaY+16,3,2,bc);
+  bone(ctx,rHaX,rHaY,rHaX-8,rHaY+14,3,2,bc);
 
-  bone(lShX, lShY, lElX, lElY, 7, 6, boneColor);
-  bone(lElX, lElY, lHaX, lHaY, 5, 4, boneColor);
-  bone(lHaX, lHaY, lHaX - 5, lHaY + 15, 4, 2, boneColor);
-  bone(lHaX, lHaY, lHaX + 3, lHaY + 16, 3, 2, boneColor);
-  bone(lHaX, lHaY, lHaX + 8, lHaY + 14, 3, 2, boneColor);
+  const hipY=spB+5+bob;
+  const lKnX=spX-18+Math.sin(legA)*15, lKnY=hipY+80;
+  const lFtX=lKnX-5+Math.sin(legA*1.2)*10, lFtY=lKnY+80;
+  bone(ctx,spX-18,hipY,lKnX,lKnY,9,8,bc);
+  bone(ctx,lKnX,lKnY,lFtX,lFtY,7,5,bc);
+  bone(ctx,lFtX,lFtY,lFtX-15,lFtY+5,5,3,bc);
 
-  // Bras droit
-  const rShX = spineX + shoulderSpan;
-  const rShY = shoulderY + 5;
-  const rElX = rShX + 20 + Math.sin(armAngle)*30;
-  const rElY = rShY + 70;
-  const rHaX = rElX + 5 + Math.sin(armAngle*1.5)*20;
-  const rHaY = rElY + 55;
+  const rKnX=spX+18-Math.sin(legA)*15, rKnY=hipY+80;
+  const rFtX=rKnX+5-Math.sin(legA*1.2)*10, rFtY=rKnY+80;
+  bone(ctx,spX+18,hipY,rKnX,rKnY,9,8,bc);
+  bone(ctx,rKnX,rKnY,rFtX,rFtY,7,5,bc);
+  bone(ctx,rFtX,rFtY,rFtX+15,rFtY+5,5,3,bc);
 
-  bone(rShX, rShY, rElX, rElY, 7, 6, boneColor);
-  bone(rElX, rElY, rHaX, rHaY, 5, 4, boneColor);
-  bone(rHaX, rHaY, rHaX + 5, rHaY + 15, 4, 2, boneColor);
-  bone(rHaX, rHaY, rHaX - 3, rHaY + 16, 3, 2, boneColor);
-  bone(rHaX, rHaY, rHaX - 8, rHaY + 14, 3, 2, boneColor);
+  const skX=spX+sway*0.3, skY=165+bob;
+  skull(ctx, skX*s, skY*s, 1);
+  drawRazana(ctx, skX*s, (skY-40)*s);
 
-  // Jambes
-  const hipY = spineBot + 5 + bob;
-
-  const lKnX = spineX - 18 + Math.sin(legAngle)*15;
-  const lKnY = hipY + 80;
-  const lFtX = lKnX - 5 + Math.sin(legAngle*1.2)*10;
-  const lFtY = lKnY + 80;
-
-  bone(spineX - 18, hipY, lKnX, lKnY, 9, 8, boneColor);
-  bone(lKnX, lKnY, lFtX, lFtY, 7, 5, boneColor);
-  bone(lFtX, lFtY, lFtX - 15, lFtY + 5, 5, 3, boneColor);
-
-  const rKnX = spineX + 18 - Math.sin(legAngle)*15;
-  const rKnY = hipY + 80;
-  const rFtX = rKnX + 5 - Math.sin(legAngle*1.2)*10;
-  const rFtY = rKnY + 80;
-
-  bone(spineX + 18, hipY, rKnX, rKnY, 9, 8, boneColor);
-  bone(rKnX, rKnY, rFtX, rFtY, 7, 5, boneColor);
-  bone(rFtX, rFtY, rFtX + 15, rFtY + 5, 5, 3, boneColor);
-
-  // Crâne
-  const skullCX = spineX + sway*0.3;
-  const skullCY = cy - 95 + bob;
-  skull(skullCX, skullCY, 1);
-
-  // Texte RAZANA
-  drawRazana(skullCX, skullCY - 40);
-
-  // Ombre au sol
-  const shadowAlpha = 0.15 + 0.05*Math.sin(t*0.07);
-  ctx.beginPath();
-  ctx.ellipse(cx + sway*0.2, 530, 50, 8, 0, 0, Math.PI*2);
-  ctx.fillStyle = `rgba(0,200,255,${shadowAlpha})`;
-  ctx.fill();
+  const sa=0.15+0.05*Math.sin(t*0.07);
+  ctx.beginPath(); ctx.ellipse((cx2+sway*0.2)*s,530*s,50*s,8*s,0,0,Math.PI*2);
+  ctx.fillStyle=`rgba(0,200,255,${sa})`; ctx.fill();
 
   t++;
   requestAnimationFrame(draw);
 }
 
-draw();
+function startAnim() { animRunning=true; draw(); }
+startAnim();
+
+/* ======= FAIRE-PART ======= */
+function fmt(ds) {
+  if (!ds) return '';
+  const d=new Date(ds);
+  return `${d.getDate()} ${['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function g(id) { return document.getElementById(id).value.trim(); }
+
+function generer() {
+  const nom=g('nom');
+  if (!nom) { alert('Mametraha ny anarana / Veuillez entrer le nom.'); return; }
+
+  let h = `<div class="prev-cross">✝</div>`;
+  const cit=g('citation');
+  if (cit) h+=`<div class="prev-intro">${cit.replace(/\n/g,'<br>')}</div>`;
+  h+=`<div class="prev-name">${nom}</div>`;
+  const titre=g('titre');
+  if (titre) h+=`<div class="prev-titre">${titre}</div>`;
+  h+=`<hr class="prev-sep">`;
+
+  const dd=g('date_deces'), age=g('age');
+  if (dd||age) {
+    h+=`<div class="prev-dates">`;
+    if (dd) h+=`Maty tamin'ny : <strong>${fmt(dd)}</strong>`;
+    if (age) h+=`&nbsp;—&nbsp;Taona : <strong>${age}</strong>`;
+    h+=`</div>`;
+  }
+
+  const vadiny=g('vadiny'), zanany=g('zanany'), tampo=g('tampo'), fautre=g('famille_autre');
+  if (vadiny||zanany||tampo||fautre) {
+    h+=`<div class="prev-fam-title">Izy :</div><div class="prev-fam">`;
+    if (vadiny) h+=`NY VADINY : ${vadiny}<br>`;
+    if (zanany) h+=`NY ZANANY : ${zanany.split(',').map(s=>s.trim()).join(', ')}<br>`;
+    if (tampo)  h+=`Ny iray tampo aminy : ${tampo}<br>`;
+    if (fautre) h+=fautre.replace(/\n/g,'<br>');
+    h+=`</div>`;
+  }
+
+  const met=g('metiers');
+  if (met) h+=`<div class="prev-metiers">${met.replace(/\n/g,'<br>')}</div>`;
+
+  const de=g('date_enterrement'), lieu=g('lieu');
+  if (de||lieu) {
+    h+=`<div class="prev-footer">`;
+    if (de) h+=`Ny fandevenana dia ho atao amin'ny <strong>${fmt(de)}</strong><br>`;
+    if (lieu) h+=`${lieu}<br>`;
+    h+=`<br>Mbola tsy fantatra ny fandevenana fa samia mihaino vaovao</div>`;
+  }
+
+  const mf=g('message_fin');
+  if (mf) h+=`<div class="prev-msgfin">${mf.replace(/\n/g,'<br>')}</div>`;
+
+  h+=`<hr class="prev-sep"><div class="prev-misaotra">Misaotra tompoko</div>`;
+
+  const box=document.getElementById('preview');
+  box.innerHTML=h; box.classList.add('visible');
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('dlBtn').classList.add('visible');
+}
+
+function telecharger() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+  const PW = 210, PH = 297;
+  const mL = 22, mR = 22, mT = 18, mBot = 18;
+  const cW = PW - mL - mR;
+  let y = mT;
+
+  // --- helpers ---
+  function setStyle(sz, st, color) {
+    doc.setFontSize(sz);
+    doc.setFont('times', st || 'normal');
+    doc.setTextColor(color || 0);
+  }
+
+  function textC(txt, sz, st, color) {
+    setStyle(sz, st, color);
+    const lines = doc.splitTextToSize(txt, cW);
+    lines.forEach(l => {
+      doc.text(l, PW / 2, y, { align: 'center' });
+      y += sz * 0.42;
+    });
+  }
+
+  function textL(txt, sz, st, color) {
+    setStyle(sz, st, color);
+    const lines = doc.splitTextToSize(txt, cW);
+    lines.forEach(l => {
+      doc.text(l, mL, y);
+      y += sz * 0.42;
+    });
+  }
+
+  function sp(h) { y += (h || 4); }
+
+  function hline(alpha) {
+    doc.setDrawColor(alpha || 150);
+    doc.setLineWidth(0.25);
+    doc.line(mL, y, PW - mR, y);
+    y += 5;
+  }
+
+  function doubleLine() {
+    doc.setDrawColor(80);
+    doc.setLineWidth(0.5);
+    doc.line(mL, y, PW - mR, y);
+    y += 1.5;
+    doc.setLineWidth(0.25);
+    doc.line(mL, y, PW - mR, y);
+    y += 5;
+  }
+
+  function checkPage(need) {
+    if (y + need > PH - mBot) {
+      doc.addPage();
+      y = mT;
+    }
+  }
+
+  // ── Bordure décorative ──
+  doc.setDrawColor(60);
+  doc.setLineWidth(0.8);
+  doc.rect(10, 10, PW - 20, PH - 20);
+  doc.setLineWidth(0.3);
+  doc.rect(12, 12, PW - 24, PH - 24);
+
+  // ── Croix en haut (dessinée, pas Unicode) ──
+  const cx = PW / 2;
+  doc.setDrawColor(30);
+  doc.setLineWidth(1.2);
+  doc.line(cx, y, cx, y + 14);       // vertical
+  doc.line(cx - 5, y + 4, cx + 5, y + 4); // horizontal
+  y += 18;
+  sp(2);
+
+  // ── Citation / intro ──
+  const cit = g('citation');
+  if (cit) {
+    checkPage(20);
+    cit.split('\n').forEach(l => textC(l, 9, 'italic', 80));
+    sp(4);
+    hline(180);
+  }
+
+  // ── Nom du défunt ──
+  const nom = g('nom') || 'Anonyme';
+  checkPage(20);
+  textC(nom.toUpperCase(), 20, 'bold', 10);
+  sp(1);
+
+  // ── Titre / qualité ──
+  const titre = g('titre');
+  if (titre) {
+    textC(titre, 12, 'italic', 50);
+    sp(2);
+  }
+
+  doubleLine();
+
+  // ── Dates ──
+  const dd = g('date_deces'), age = g('age');
+  if (dd || age) {
+    checkPage(10);
+    let dl = '';
+    if (dd)  dl += `Maty tamin'ny : ${fmt(dd)}`;
+    if (age) dl += `   —   Taona : ${age}`;
+    textC(dl, 10, 'normal', 0);
+    sp(5);
+  }
+
+  // ── Famille ──
+  const vadiny = g('vadiny'), zanany = g('zanany');
+  const tampo  = g('tampo'),  fautre = g('famille_autre');
+  if (vadiny || zanany || tampo || fautre) {
+    checkPage(15);
+    textL('Izy :', 10, 'bold', 0);
+    sp(1);
+    if (vadiny) { textL('NY VADINY : ' + vadiny, 10, 'normal', 0); }
+    if (zanany) { textL('NY ZANANY : ' + zanany.split(',').map(s => s.trim()).join(', '), 10, 'normal', 0); }
+    if (tampo)  { textL('Ny iray tampo aminy : ' + tampo, 10, 'normal', 0); }
+    if (fautre) { fautre.split('\n').forEach(l => { if(l.trim()) textL(l, 10, 'normal', 0); }); }
+    sp(5);
+  }
+
+  // ── Metiers / activités ──
+  const met = g('metiers');
+  if (met) {
+    checkPage(10);
+    hline(200);
+    met.split('\n').forEach(l => { if(l.trim()) textC(l, 9, 'normal', 40); });
+    sp(5);
+  }
+
+  hline(150);
+
+  // ── Enterrement ──
+  const de = g('date_enterrement'), lieu = g('lieu');
+  if (de || lieu) {
+    checkPage(20);
+    if (de) textC(`Ny fandevenana dia ho atao amin'ny ${fmt(de)}`, 11, 'bold', 0);
+    if (lieu) { sp(1); textC(lieu, 9, 'italic', 50); }
+    sp(3);
+    textC('Mbola tsy fantatra ny fandevenana fa samia mihaino vaovao', 8, 'italic', 100);
+    sp(5);
+  }
+
+  // ── Message final ──
+  const mf = g('message_fin');
+  if (mf) {
+    checkPage(15);
+    hline(200);
+    mf.split('\n').forEach(l => { if(l.trim()) textC(l, 10, 'italic', 30); });
+    sp(5);
+  }
+
+  doubleLine();
+
+  // ── Misaotra ──
+  checkPage(10);
+  textC('Misaotra tompoko', 13, 'bold', 0);
+
+  // ── Croix en bas ──
+  sp(6);
+  const cx2 = PW / 2;
+  doc.setDrawColor(80);
+  doc.setLineWidth(0.8);
+  doc.line(cx2, y, cx2, y + 8);
+  doc.line(cx2 - 3, y + 2.5, cx2 + 3, y + 2.5);
+
+  // ── Enregistrer ──
+  const filename = `faire_part_${nom.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}.pdf`;
+  doc.save(filename);
+}
 </script>
 </body>
 </html>
