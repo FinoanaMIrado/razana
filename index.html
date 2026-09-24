@@ -3,21 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RAZANA</title>v
+<title>RAZANA</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: Georgia, serif;
+  font-family: 'Georgia', serif;
   background: #0a0a1a;
   min-height: 100vh;
   color: #fff;
 }
 
+/* NAV */
 nav {
   display: flex;
   justify-content: center;
+  gap: 0;
   background: rgba(255,255,255,0.04);
   border-bottom: 1px solid rgba(0,200,255,0.15);
   position: sticky;
@@ -45,9 +47,11 @@ nav button.active {
 
 nav button:hover { color: #e0c88a; }
 
+/* PAGES */
 .page { display: none; }
 .page.active { display: block; }
 
+/* ===== PAGE 1 : SQUELETTE ===== */
 #page-skel {
   display: none;
   flex-direction: column;
@@ -60,6 +64,7 @@ nav button:hover { color: #e0c88a; }
 
 canvas { display: block; border-radius: 12px; }
 
+/* ===== PAGE 2 : FAIRE-PART ===== */
 #page-fp {
   display: none;
   flex-direction: column;
@@ -153,6 +158,7 @@ textarea { resize: vertical; min-height: 65px; }
 }
 .btn-preview:hover { background: #0a0a1a; }
 
+/* APERÇU */
 .preview-box {
   background: #fff;
   border-radius: 12px;
@@ -163,7 +169,7 @@ textarea { resize: vertical; min-height: 65px; }
   color: #222;
   display: none;
   border: 2px solid #2c2c2c;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Times New Roman', serif;
 }
 .preview-box.visible { display: block; }
 
@@ -203,77 +209,80 @@ textarea { resize: vertical; min-height: 65px; }
 <body>
 
 <nav>
-  <button class="active" onclick="showPage('skel', this)">RAZANA</button>
-  <button onclick="showPage('fp', this)">Fera-para</button>
+  <button class="active" onclick="showPage('skel', this)"> RAZANA</button>
+  <button onclick="showPage('fp', this)"> Fera-para</button>
 </nav>
 
+<!-- PAGE SQUELETTE -->
 <div id="page-skel" class="page active">
   <canvas id="c"></canvas>
 </div>
 
+<!-- PAGE FAIRE-PART -->
 <div id="page-fp" class="page">
-  <p class="fp-title">Fera-para</p>
+  <p class="fp-title">fera-para adaladala</p>
   <p class="fp-sub">Fanambarana ny fiafaranandro</p>
 
   <div class="card">
     <div class="section-title">Ny maty</div>
 
-    <label>Anarana feno</label>
-    <input id="nom" type="text" placeholder="oh : RAKOTOBE Jean">
+    <label>Anarana feno </label>
+    <input id="nom" type="text" placeholder="oh : RAKOTOBE Jean" required>
 
-    <label>Asa</label>
-    <input id="titre" type="text" placeholder="oh : Mpisoloky...">
+    <label>Asa </label>
+    <input id="titre" type="text" placeholder="oh : Mpisoloky..." required>
 
     <div class="row2">
       <div>
         <label>Daty nahafatesana</label>
-        <input id="date_deces" type="date">
+        <input id="date_deces" type="date" required>
       </div>
       <div>
         <label>Taona</label>
-        <input id="age" type="number" placeholder="oh : 72">
+        <input id="age" type="number" placeholder="oh : 72" required >
       </div>
     </div>
 
-    <label>Daty fandevenana</label>
-    <input id="date_enterrement" type="date">
+    <label>Daty fandevenana </label>
+    <input id="date_enterrement" type="date" required>
 
-    <label>Ora sy toerana</label>
+    <label>Ora sy toerana </label>
     <input id="lieu" type="text" placeholder="oh : 9h00 ao @ FJKM Analakely, Antananarivo">
 
-    <div class="section-title">Fianakaviana</div>
+    <div class="section-title">Fianakaviana </div>
 
-    <label>Vadiny</label>
+    <label>Vadiny </label>
     <input id="vadiny" type="text" placeholder="oh : KialaNgita">
 
-    <label>Zanany</label>
-    <input id="zanany" type="text" placeholder="oh : Babouzina, Chun Lee, Sitraka">
+    <label>Zanany </label>
+    <input id="zanany" type="text" placeholder="ex : Babouzina, Chun  Lee, Sitraka">
 
     <label>Iray tampo aminy</label>
     <input id="tampo" type="text" placeholder="oh : Adakely">
 
-    <label>Fianakaviana hafa</label>
+    <label>Fianakaviana hafa </label>
     <textarea id="famille_autre" placeholder="oh : Ny zafy, ny zama, ny dadatoa..."></textarea>
 
-    <div class="section-title">  Fikambanana nisy azy XD</div>
+    <div class="section-title">Fikambanana nisy azy XD </div>
 
-    <label>Sokainy kkkk</label>
-    <textarea id="metiers" placeholder="Mpangalatra, mpamaky trano..."></textarea>
+    <label>Sokajy</label>
+    <textarea id="metiers" placeholder=" Mpangalatra ..."></textarea>
 
-    <label>Teny masina kely ery ambony XD</label>
-    <textarea id="citation" placeholder="oh : dia nantsoin'ny Ray hody any Aminy..."></textarea>
+    <label>Teny masina kely XD</label>
+    <textarea id="citation" placeholder="ex : dia nantsoin'ny Ray hody any Aminy..."></textarea>
 
-    <label>Hafatra farany</label>
-    <textarea id="message_fin" placeholder="oh : Ny fiaretantory dia isan-kalina&#10;Misy iany koa ny fiaretana atoandro"></textarea>
+    <label>Hafatra farany </label>
+    <textarea id="message_fin" placeholder="ex : Ny fiaretantory dia isan-kalina&#10;Misy iany koa ny fiaretana atoandro"></textarea>
 
-    <button class="btn-preview" onclick="generer()">Jerena amzay kalouny</button>
+    <button class="btn-preview" onclick="generer()">Lay fera-para</button>
   </div>
 
   <div class="preview-box" id="preview"></div>
-  <button class="btn-dl" id="dlBtn" onclick="telecharger()">Telechargeoooo ary</button>
+  <button class="btn-dl" id="dlBtn" onclick="telecharger()">Telecharzeoooo ary </button>
 </div>
 
 <script>
+/* ======= NAVIGATION ======= */
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -282,6 +291,7 @@ function showPage(id, btn) {
   if (id === 'skel' && !animRunning) startAnim();
 }
 
+/* ======= SQUELETTE 3D ======= */
 let animRunning = false;
 let t = 0;
 const canvas = document.getElementById('c');
@@ -389,7 +399,7 @@ function draw() {
     ctx.fillStyle=`rgba(0,200,255,${a})`; ctx.fill();
   }
 
-  const s=parseFloat(canvas.dataset.scale)||1;
+  const cx2=W/2, cy2=H/2;
   const sway=Math.sin(t*0.04)*8, bob=Math.sin(t*0.07)*5, breathe=Math.sin(t*0.05)*2;
   const armA=Math.sin(t*0.06)*0.4, legA=Math.sin(t*0.06)*0.3;
   const bc='#a8d8e8';
@@ -401,11 +411,13 @@ function draw() {
     bone(ctx,spX,y,spX,yn,5+breathe,5+breathe,bc);
   }
 
+  // Bassin
   ctx.beginPath(); ctx.ellipse(spX*s,spB*s,32*s,14*s,0,0,Math.PI*2);
   const pg=ctx.createRadialGradient(spX*s-8*s,spB*s-5*s,s,spX*s,spB*s,32*s);
   pg.addColorStop(0,'#fff'); pg.addColorStop(0.6,'#a8d8e8'); pg.addColorStop(1,'#5a9ab0');
   ctx.fillStyle=pg; ctx.fill(); ctx.strokeStyle='rgba(0,200,255,0.4)'; ctx.lineWidth=0.8*s; ctx.stroke();
 
+  // Côtes
   const chX=spX, chY=240+bob;
   for(let i=0;i<5;i++){
     const ry=chY+i*14, sp2=22+i*2+breathe;
@@ -458,7 +470,7 @@ function draw() {
   drawRazana(ctx, skX*s, (skY-40)*s);
 
   const sa=0.15+0.05*Math.sin(t*0.07);
-  ctx.beginPath(); ctx.ellipse((W/2+sway*0.2)*s,530*s,50*s,8*s,0,0,Math.PI*2);
+  ctx.beginPath(); ctx.ellipse((cx2+sway*0.2)*s,530*s,50*s,8*s,0,0,Math.PI*2);
   ctx.fillStyle=`rgba(0,200,255,${sa})`; ctx.fill();
 
   t++;
@@ -468,70 +480,69 @@ function draw() {
 function startAnim() { animRunning=true; draw(); }
 startAnim();
 
+/* ======= FAIRE-PART ======= */
 function fmt(ds) {
   if (!ds) return '';
-  const d = new Date(ds);
-  const mois = ['Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre'];
-  return `${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+  const d=new Date(ds);
+  return `${d.getDate()} ${['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function g(id) { return document.getElementById(id).value.trim(); }
 
 function generer() {
-  const nom = g('nom');
-  if (!nom) { alert('Mametraha ny anarana aloha.'); return; }
+  const nom=g('nom');
+  if (!nom) { alert('Mametraha ny anarana / Veuillez entrer le nom.'); return; }
 
-  let h = `<div class="prev-cross">+</div>`;
-  const cit = g('citation');
-  if (cit) h += `<div class="prev-intro">${cit.replace(/\n/g,'<br>')}</div>`;
-  h += `<div class="prev-name">${nom}</div>`;
-  const titre = g('titre');
-  if (titre) h += `<div class="prev-titre">${titre}</div>`;
-  h += `<hr class="prev-sep">`;
+  let h = `<div class="prev-cross">✝</div>`;
+  const cit=g('citation');
+  if (cit) h+=`<div class="prev-intro">${cit.replace(/\n/g,'<br>')}</div>`;
+  h+=`<div class="prev-name">${nom}</div>`;
+  const titre=g('titre');
+  if (titre) h+=`<div class="prev-titre">${titre}</div>`;
+  h+=`<hr class="prev-sep">`;
 
-  const dd = g('date_deces'), age = g('age');
-  if (dd || age) {
-    h += `<div class="prev-dates">`;
-    if (dd)  h += `Maty tamin'ny : <strong>${fmt(dd)}</strong>`;
-    if (age) h += `&nbsp; Taona : <strong>${age}</strong>`;
-    h += `</div>`;
+  const dd=g('date_deces'), age=g('age');
+  if (dd||age) {
+    h+=`<div class="prev-dates">`;
+    if (dd) h+=`Maty tamin'ny : <strong>${fmt(dd)}</strong>`;
+    if (age) h+=`&nbsp;—&nbsp;Taona : <strong>${age}</strong>`;
+    h+=`</div>`;
   }
 
-  const vadiny = g('vadiny'), zanany = g('zanany'), tampo = g('tampo'), fautre = g('famille_autre');
-  if (vadiny || zanany || tampo || fautre) {
-    h += `<div class="prev-fam-title">Izy :</div><div class="prev-fam">`;
-    if (vadiny) h += `NY VADINY : ${vadiny}<br>`;
-    if (zanany) h += `NY ZANANY : ${zanany.split(',').map(s=>s.trim()).join(', ')}<br>`;
-    if (tampo)  h += `Ny iray tampo aminy : ${tampo}<br>`;
-    if (fautre) h += fautre.replace(/\n/g,'<br>');
-    h += `</div>`;
+  const vadiny=g('vadiny'), zanany=g('zanany'), tampo=g('tampo'), fautre=g('famille_autre');
+  if (vadiny||zanany||tampo||fautre) {
+    h+=`<div class="prev-fam-title">Izy :</div><div class="prev-fam">`;
+    if (vadiny) h+=`NY VADINY : ${vadiny}<br>`;
+    if (zanany) h+=`NY ZANANY : ${zanany.split(',').map(s=>s.trim()).join(', ')}<br>`;
+    if (tampo)  h+=`Ny iray tampo aminy : ${tampo}<br>`;
+    if (fautre) h+=fautre.replace(/\n/g,'<br>');
+    h+=`</div>`;
   }
 
-  const met = g('metiers');
-  if (met) h += `<div class="prev-metiers">${met.replace(/\n/g,'<br>')}</div>`;
+  const met=g('metiers');
+  if (met) h+=`<div class="prev-metiers">${met.replace(/\n/g,'<br>')}</div>`;
 
-  const de = g('date_enterrement'), lieu = g('lieu');
-  if (de || lieu) {
-    h += `<div class="prev-footer">`;
-    if (de)  h += `Ny fandevenana dia ho atao amin'ny <strong>${fmt(de)}</strong><br>`;
-    if (lieu) h += `${lieu}<br>`;
-    h += `<br>Mbola tsy fantatra ny fandevenana fa samia mihaino vaovao</div>`;
+  const de=g('date_enterrement'), lieu=g('lieu');
+  if (de||lieu) {
+    h+=`<div class="prev-footer">`;
+    if (de) h+=`Ny fandevenana dia ho atao amin'ny <strong>${fmt(de)}</strong><br>`;
+    if (lieu) h+=`${lieu}<br>`;
+    h+=`<br>Mbola tsy fantatra ny fandevenana fa samia mihaino vaovao</div>`;
   }
 
-  const mf = g('message_fin');
-  if (mf) h += `<div class="prev-msgfin">${mf.replace(/\n/g,'<br>')}</div>`;
+  const mf=g('message_fin');
+  if (mf) h+=`<div class="prev-msgfin">${mf.replace(/\n/g,'<br>')}</div>`;
 
-  h += `<hr class="prev-sep"><div class="prev-misaotra">Misaotra tompoko</div>`;
+  h+=`<hr class="prev-sep"><div class="prev-misaotra">Misaotra tompoko</div>`;
 
-  const box = document.getElementById('preview');
-  box.innerHTML = h;
-  box.classList.add('visible');
-  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const box=document.getElementById('preview');
+  box.innerHTML=h; box.classList.add('visible');
+  box.scrollIntoView({behavior:'smooth',block:'start'});
   document.getElementById('dlBtn').classList.add('visible');
 }
 
 function telecharger() {
-  const { jsPDF } = window.jspdf;
+  const {jsPDF} = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
   const PW = 210, PH = 297;
@@ -539,6 +550,7 @@ function telecharger() {
   const cW = PW - mL - mR;
   let y = mT;
 
+  // --- helpers ---
   function setStyle(sz, st, color) {
     doc.setFontSize(sz);
     doc.setFont('times', st || 'normal');
@@ -547,7 +559,8 @@ function telecharger() {
 
   function textC(txt, sz, st, color) {
     setStyle(sz, st, color);
-    doc.splitTextToSize(txt, cW).forEach(l => {
+    const lines = doc.splitTextToSize(txt, cW);
+    lines.forEach(l => {
       doc.text(l, PW / 2, y, { align: 'center' });
       y += sz * 0.42;
     });
@@ -555,7 +568,8 @@ function telecharger() {
 
   function textL(txt, sz, st, color) {
     setStyle(sz, st, color);
-    doc.splitTextToSize(txt, cW).forEach(l => {
+    const lines = doc.splitTextToSize(txt, cW);
+    lines.forEach(l => {
       doc.text(l, mL, y);
       y += sz * 0.42;
     });
@@ -581,26 +595,29 @@ function telecharger() {
   }
 
   function checkPage(need) {
-    if (y + need > PH - mBot) { doc.addPage(); y = mT; }
+    if (y + need > PH - mBot) {
+      doc.addPage();
+      y = mT;
+    }
   }
 
-  // Bordure
+  // ── Bordure décorative ──
   doc.setDrawColor(60);
   doc.setLineWidth(0.8);
   doc.rect(10, 10, PW - 20, PH - 20);
   doc.setLineWidth(0.3);
   doc.rect(12, 12, PW - 24, PH - 24);
 
-  // Croix dessinee
+  // ── Croix en haut (dessinée, pas Unicode) ──
   const cx = PW / 2;
   doc.setDrawColor(30);
   doc.setLineWidth(1.2);
-  doc.line(cx, y, cx, y + 14);
-  doc.line(cx - 5, y + 4, cx + 5, y + 4);
+  doc.line(cx, y, cx, y + 14);       // vertical
+  doc.line(cx - 5, y + 4, cx + 5, y + 4); // horizontal
   y += 18;
   sp(2);
 
-  // Citation
+  // ── Citation / intro ──
   const cit = g('citation');
   if (cit) {
     checkPage(20);
@@ -609,87 +626,92 @@ function telecharger() {
     hline(180);
   }
 
-  // Nom
+  // ── Nom du défunt ──
   const nom = g('nom') || 'Anonyme';
   checkPage(20);
   textC(nom.toUpperCase(), 20, 'bold', 10);
   sp(1);
 
-  // Titre
+  // ── Titre / qualité ──
   const titre = g('titre');
-  if (titre) { textC(titre, 12, 'italic', 50); sp(2); }
+  if (titre) {
+    textC(titre, 12, 'italic', 50);
+    sp(2);
+  }
 
   doubleLine();
 
-  // Dates
+  // ── Dates ──
   const dd = g('date_deces'), age = g('age');
   if (dd || age) {
     checkPage(10);
     let dl = '';
     if (dd)  dl += `Maty tamin'ny : ${fmt(dd)}`;
-    if (age) dl += `  Taona : ${age}`;
+    if (age) dl += `      Taona : ${age}`;
     textC(dl, 10, 'normal', 0);
     sp(5);
   }
 
-  // Famille
+  // ── Famille ──
   const vadiny = g('vadiny'), zanany = g('zanany');
   const tampo  = g('tampo'),  fautre = g('famille_autre');
   if (vadiny || zanany || tampo || fautre) {
     checkPage(15);
     textL('Izy :', 10, 'bold', 0);
     sp(1);
-    if (vadiny) textL('NY VADINY : ' + vadiny, 10, 'normal', 0);
-    if (zanany) textL('NY ZANANY : ' + zanany.split(',').map(s => s.trim()).join(', '), 10, 'normal', 0);
-    if (tampo)  textL('Ny iray tampo aminy : ' + tampo, 10, 'normal', 0);
-    if (fautre) fautre.split('\n').forEach(l => { if (l.trim()) textL(l, 10, 'normal', 0); });
+    if (vadiny) { textL('NY VADINY : ' + vadiny, 10, 'normal', 0); }
+    if (zanany) { textL('NY ZANANY : ' + zanany.split(',').map(s => s.trim()).join(', '), 10, 'normal', 0); }
+    if (tampo)  { textL('Ny iray tampo aminy : ' + tampo, 10, 'normal', 0); }
+    if (fautre) { fautre.split('\n').forEach(l => { if(l.trim()) textL(l, 10, 'normal', 0); }); }
     sp(5);
   }
 
-  // Metiers
+  // ── Metiers / activités ──
   const met = g('metiers');
   if (met) {
     checkPage(10);
     hline(200);
-    met.split('\n').forEach(l => { if (l.trim()) textC(l, 9, 'normal', 40); });
+    met.split('\n').forEach(l => { if(l.trim()) textC(l, 9, 'normal', 40); });
     sp(5);
   }
 
   hline(150);
 
-  // Enterrement
+  // ── Enterrement ──
   const de = g('date_enterrement'), lieu = g('lieu');
   if (de || lieu) {
     checkPage(20);
-    if (de)  textC(`Ny fandevenana dia ho atao amin'ny ${fmt(de)}`, 11, 'bold', 0);
+    if (de) textC(`Ny fandevenana dia ho atao amin'ny ${fmt(de)}`, 11, 'bold', 0);
     if (lieu) { sp(1); textC(lieu, 9, 'italic', 50); }
     sp(3);
     // textC('Mbola tsy fantatra ny fandevenana fa samia mihaino vaovao', 8, 'italic', 100);
     sp(5);
   }
 
-  // Message final
+  // ── Message final ──
   const mf = g('message_fin');
   if (mf) {
     checkPage(15);
     hline(200);
-    mf.split('\n').forEach(l => { if (l.trim()) textC(l, 10, 'italic', 30); });
+    mf.split('\n').forEach(l => { if(l.trim()) textC(l, 10, 'italic', 30); });
     sp(5);
   }
 
   doubleLine();
 
-  // Misaotra
+  // ── Misaotra ──
   checkPage(10);
   textC('Misaotra tompoko', 13, 'bold', 0);
 
-  // Croix bas
+  // ── Croix en bas ──
   sp(6);
+  const cx2 = PW / 2;
   doc.setDrawColor(80);
   doc.setLineWidth(0.8);
-  doc.line(PW/2, y, PW/2, y + 8);
-  doc.line(PW/2 - 3, y + 2.5, PW/2 + 3, y + 2.5);
+  doc.line(cx2, y, cx2, y + 8);
+  doc.line(cx2 - 3, y + 2.5, cx2 + 3, y + 2.5);
 
+  // ── Enregistrer ──
   const filename = `faire_part_${nom.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}.pdf`;
   doc.save(filename);
 }
